@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS Config  - Global infrastructure
+
+Resources:
+
+  ConfigRuleForUnusedUser:
+    Type: 'AWS::Config::ConfigRule'
+    Properties:
+      ConfigRuleName: check-for-unused-user
+      Description: >-
+        Checks whether your AWS Identity and Access Management (IAM) users have
+        passwords or active access keys that have not been used within the
+        specified number of days you provided.
+      InputParameters:
+        maxCredentialUsageAge: 90
+      Scope: {}
+      Source:
+        Owner: AWS
+        SourceIdentifier: IAM_USER_UNUSED_CREDENTIALS_CHECK
+      MaximumExecutionFrequency: TwentyFour_Hours
+
+  ConfigRuleForAdminAccess:
+    Type: 'AWS::Config::ConfigRule'
+    Properties:
+      ConfigRuleName: check-for-iam-policy-no-statements-with-admin-access
+      Description: >-
+        Checks whether the default version of AWS Identity and Access Management
+        (IAM) policies do not have administrator access. If any statement has
+        "Effect": "Allow" with "Action": "*" over "Resource": "*", the rule is
+        non-compliant.
+      InputParameters: {}
+      Scope:
+        ComplianceResourceTypes:
+          - 'AWS::IAM::Policy'
+      Source:
+        Owner: AWS
+        SourceIdentifier: IAM_POLICY_NO_STATEMENTS_WITH_ADMIN_ACCESS
+
+  ConfigRuleForCloudtrail:
+    Type: 'AWS::Config::ConfigRule'
+    Properties:
+      ConfigRuleName: check-for-cloudtrail
+      Description: >-
+        Checks that there is at least one multi-region AWS CloudTrail. The rule
+        is non-compliant if the trails do not match input parameters
+      Scope: {}
+      Source:
+        Owner: AWS
+        SourceIdentifier: MULTI_REGION_CLOUD_TRAIL_ENABLED
+      MaximumExecutionFrequency: TwentyFour_Hours
+
+  ConfigRuleFormaxAccessKeyAge:
+    Type: 'AWS::Config::ConfigRule'
+    Properties:
+      ConfigRuleName: check-for-max-accesskey-age
+      Description: >-
+        Checks whether the active access keys are rotated within the number of
+        days specified in maxAccessKeyAge. The rule is non-compliant if the
+        access keys have not been rotated for more than maxAccessKeyAge number
+        of days.
+      InputParameters:
+        maxAccessKeyAge: 90
+      Scope: {}
+      Source:
+        Owner: AWS
+        SourceIdentifier: ACCESS_KEYS_ROTATED
+      MaximumExecutionFrequency: TwentyFour_Hours
